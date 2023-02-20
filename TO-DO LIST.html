@@ -2,9 +2,69 @@
 <html>
   <head>
     <title>TO-DO List</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
-  <body>
+<style>
+.container {
+  width: 500px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+form {
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+input[type="text"] {
+  width: 60%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #3e8e41;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  font-size: 16px;
+  text-align: left;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+.completed {
+  text-decoration: line-through;
+  color: #888;
+}
+</style>
+<body>
     <div class="container">
       <h1>TO-DO List</h1>
       <form>
@@ -14,6 +74,40 @@
       <ul id="items-list">
       </ul>
     </div>
-    <script src="script.js"></script>
-  </body>
+<script>
+// Get DOM elements
+const newItemInput = document.getElementById("new-item");
+const addBtn = document.getElementById("add-btn");
+const itemsList = document.getElementById("items-list");
+
+// Add new item to the list
+function addItem(event) {
+  // Prevent form submission
+  event.preventDefault();
+
+  // Get the value of the input field
+  const newItemValue = newItemInput.value.trim();
+
+  // If the input field is not empty, create a new item and append it to the list
+  if (newItemValue !== "") {
+    const newItem = document.createElement("li");
+    newItem.innerText = newItemValue;
+    itemsList.appendChild(newItem);
+    newItemInput.value = "";
+  }
+}
+
+// Toggle item completion
+function toggleItemCompletion(event) {
+  if (event.target.tagName === "LI") {
+    event.target.classList.toggle("completed");
+  }
+}
+
+// Add event listeners
+addBtn.addEventListener("click", addItem);
+itemsList.addEventListener("click", toggleItemCompletion);
+
+</script>
+</body>
 </html>
