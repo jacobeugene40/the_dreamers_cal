@@ -2,9 +2,80 @@
 <html>
 <head>
   <title>Complex Scientific Calculator</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
+<style>
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+}
+.calculator {
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+  display: inline-block;
+  margin: 20px auto;
+  padding: 20px;
+  width: 300px;
+}
+
+.screen {
+  background-color: #f2f2f2;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
+  text-align: right;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 10px;
+}
+
+.button {
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 16px;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #3e8e41;
+}
+
+.button:active {
+  background-color: #3e8e41;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3) inset;
+}
+
+.button:focus {
+  outline: none;
+}
+#D{ 
+  background-color: lightgreen;
+  text-align: center;
+
+}
+
+@media only screen and (max-width: 500px) {
+  .calculator {
+    width: 80%;
+  }
+
+  .buttons {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+</style>
+
   <div class="calculator">
     <div class="screen">
       <input type="text" id="result" readonly>
@@ -41,6 +112,191 @@
       <button class="button" onclick="insert('+')">+</button>
     </div>
   </div>
-  <script type="text/javascript" src="script.js"></script>
+  // Define variables for calculator state
+let firstOperand = '';
+let operator = '';
+let secondOperand = '';
+let result = null;
+
+// Define variables for DOM elements
+const screen = document.querySelector('.screen');
+const buttons = document.querySelectorAll('.button');
+
+// Add event listeners to buttons
+buttons.forEach(button => {
+  button.addEventListener('click', handleButtonClick);
+});
+
+function handleButtonClick(event) {
+  const clickedButtonValue = event.target.value;
+
+  if (clickedButtonValue === 'AC') {
+    clearScreen();
+  } else if (clickedButtonValue === '+/-') {
+    toggleSign();
+  } else if (clickedButtonValue === '.') {
+    addDecimal();
+  } else if (clickedButtonValue === '=') {
+    calculateResult();
+  } else if (clickedButtonValue === 'sqrt') {
+    calculateSqrt();
+  } else if (clickedButtonValue === 'pow') {
+    storeFirstOperand();
+    operator = 'pow';
+    updateScreen(`(${firstOperand})^`);
+  } else if (clickedButtonValue === 'log') {
+    calculateLog();
+  } else if (isNumber(clickedButtonValue)) {
+    appendNumber(clickedButtonValue);
+  } else if (isOperator(clickedButtonValue)) {
+    storeFirstOperand();
+    operator = clickedButtonValue;
+    updateScreen(`${firstOperand} ${operator} `);
+  }
+}
+
+function clearScreen() {
+  firstOperand = '';
+  operator = '';
+  secondOperand = '';
+  result = null;
+  updateScreen('');
+}
+
+function toggleSign() {
+  const currentValue = screen.textContent;
+
+  if (currentValue !== '' && currentValue !== '0') {
+    if (currentValue.startsWith('-')) {
+      updateScreen(currentValue.slice(1));
+    } else {
+      updateScreen(`-${currentValue}`);
+    }
+  }
+}
+
+function addDecimal() {
+  const currentValue = screen.textContent;
+
+  if (!currentValue.includes('.')) {
+    updateScreen(`${currentValue}.`);
+  }
+}
+
+function calculateResult() {
+  if (operator && secondOperand !== '') {
+    const first = parseFloat(firstOperand);
+    const second = parseFloat(secondOperand);
+
+    switch (operator) {
+      case '+':
+        result = first + second;
+        break;
+      case '-':
+        result = first - second;
+        break;
+      case '*':
+        result = first * second;
+        break;
+      case '/':
+        result = first / second;
+        break;
+    }
+
+    updateScreen(result.toString());
+    firstOperand = result.toString();
+    secondOperand = '';
+    operator = '';
+    result = null;
+  }
+}
+
+function calculateSqrt() {
+  const currentValue = parseFloat(screen.textContent);
+
+  if (currentValue >= 0) {
+    const result = Math.sqrt(currentValue);
+    updateScreen(result.toString());
+    firstOperand = result.toString();
+    secondOperand = '';
+    operator = '';
+    result = null;
+  } else {
+    updateScreen('Error');
+  }
+}
+
+function calculateLog() {
+  const currentValue = parseFloat(screen.textContent);
+
+  if (currentValue > 0) {
+    const result = Math.log10(currentValue);
+    updateScreen(result.toString());
+    firstOperand = result.toString();
+    secondOperand = '';
+    operator = '';
+    result = null;
+  } else {
+    updateScreen('Error');
+  }
+}
+
+function storeFirstOperand() {
+  if (firstOperand === '' && screen.textContent !== '') {
+    firstOperand = screen.textContent;
+  }
+}
+
+function appendNumber(number) {
+ if (screen.textContent === '0' || result !== null) {
+    updateScreen(number.toString());
+  } else {
+    updateScreen(screen.textContent + number.toString());
+  }
+
+  if (operator === '') {
+    firstOperand = screen.textContent;
+  } else {
+    secondOperand = screen.textContent;
+  }
+}
+
+function insert(value) {
+  document.getElementById('result').value += value;
+}
+
+function isNumber(value) {
+  return /^\d+$/.test(value);
+
+}
+function isOperator(value) {
+  return ['+', '-', '*', '/'].includes(value);
+}
+
+
+function insert(character) {
+  var result = document.getElementById("result");
+  result.value += character;
+}
+
+function clearResult() {
+  var result = document.getElementById("result");
+  result.value = "";
+}
+
+function backspace() {
+  var result = document.getElementById("result");
+  result.value = result.value.slice(0, -1);
+}
+
+function calculate() {
+  var result = document.getElementById("result");
+  var expression = result.value;
+  var answer = eval(expression);
+  result.value = answer;
+}
+
 </body>
 </html>
+
+
